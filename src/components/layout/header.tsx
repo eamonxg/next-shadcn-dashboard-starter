@@ -4,6 +4,7 @@ import { Separator } from '../ui/separator';
 import { Breadcrumbs } from '../breadcrumbs';
 import { ThemeModeToggle } from '../themes/theme-mode-toggle';
 import { ThemeSelector } from '../themes/theme-selector';
+import SearchInput from '../search-input';
 
 export default function Header() {
   return (
@@ -15,6 +16,9 @@ export default function Header() {
       </div>
 
       <div className='flex shrink-0 items-center gap-1 px-2 sm:gap-2 sm:px-4'>
+        <div className='hidden md:flex'>
+          <SearchInput />
+        </div>
         <ThemeSelector />
         <ThemeModeToggle />
       </div>
