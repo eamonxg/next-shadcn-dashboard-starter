@@ -7,7 +7,7 @@ import { dashboardQueryOptions, recordsQueryOptions } from '@/features/news-tips
 import type { InsightItem, NewsTipFilters } from '@/features/news-tips/api/types';
 import { CategoryBar } from '@/features/news-tips/components/category-bar';
 import { ChannelPie } from '@/features/news-tips/components/channel-pie';
-import { DistrictHeatGrid } from '@/features/news-tips/components/district-heat-grid';
+import { RegionHeatMap } from '@/features/news-tips/components/region-heat-map';
 import { InsightStrip } from '@/features/news-tips/components/insight-strip';
 import { KpiCards } from '@/features/news-tips/components/kpi-cards';
 import { StatusProgress } from '@/features/news-tips/components/status-progress';
@@ -73,7 +73,7 @@ export function Cockpit() {
         </div>
       </div>
 
-      <DistrictHeatGrid
+      <RegionHeatMap
         data={dashboard.districts}
         activeDistricts={[]}
         onSelect={(district) => drill({ district })}

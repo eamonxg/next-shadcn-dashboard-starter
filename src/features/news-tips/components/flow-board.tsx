@@ -1,12 +1,18 @@
 'use client';
 
 import { useState, type ReactNode } from 'react';
-import { DndContext, useDroppable, type DragEndEvent } from '@dnd-kit/core';
+import {
+  DndContext,
+  DragOverlay,
+  useDroppable,
+  type DragStartEvent,
+  type DragEndEvent
+} from '@dnd-kit/core';
 
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { NewsTipRecordWithPriority, NewsTipStatus } from '@/features/news-tips/api/types';
-import { FlowCard } from '@/features/news-tips/components/flow-card';
+import { FlowCard, FlowCardOverlay } from '@/features/news-tips/components/flow-card';
 import {
   DetailDialog,
   NoteDialog,
@@ -71,10 +77,17 @@ export function FlowBoard() {
   const { moveStatus, reassign, addNote, revert } = useFlowActions();
 
   const [activeFrom, setActiveFrom] = useState<NewsTipStatus | null>(null);
+  const [activeRecord, setActiveRecord] = useState<NewsTipRecordWithPriority | null>(null);
   const [dialog, setDialog] = useState<DialogState>(null);
+
+  function handleDragStart(event: DragStartEvent) {
+    setActiveFrom((event.active.data.current?.status as NewsTipStatus) ?? null);
+    setActiveRecord(items.find((item) => item.id === String(event.active.id)) ?? null);
+  }
 
   function handleDragEnd(event: DragEndEvent) {
     setActiveFrom(null);
+    setActiveRecord(null);
 
     const to = event.over?.id as NewsTipStatus | undefined;
     const record = items.find((item) => item.id === String(event.active.id));
@@ -93,10 +106,11 @@ export function FlowBoard() {
     <div className='grid gap-4'>
       <WorkbenchNav />
       <DndContext
-        onDragStart={(event) =>
-          setActiveFrom((event.active.data.current?.status as NewsTipStatus) ?? null)
-        }
-        onDragCancel={() => setActiveFrom(null)}
+        onDragStart={handleDragStart}
+        onDragCancel={() => {
+          setActiveFrom(null);
+          setActiveRecord(null);
+        }}
         onDragEnd={handleDragEnd}
       >
         <div className='grid gap-4 md:grid-cols-2 xl:grid-cols-4'>
@@ -124,6 +138,7 @@ export function FlowBoard() {
             </Column>
           ))}
         </div>
+        <DragOverlay>{activeRecord ? <FlowCardOverlay record={activeRecord} /> : null}</DragOverlay>
       </DndContext>
 
       <RejectDialog

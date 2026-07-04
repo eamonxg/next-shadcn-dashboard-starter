@@ -25,22 +25,18 @@ interface FlowCardProps {
 
 export function FlowCard({ record, onDetail, onReassign, onNote, onRevert }: FlowCardProps) {
   const isTerminal = TERMINAL_STATUSES.includes(record.status);
-  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: record.id,
     disabled: isTerminal,
     data: { status: record.status }
   });
-  const style = transform
-    ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)` }
-    : undefined;
 
   return (
     <div
       ref={setNodeRef}
-      style={style}
       className={cn(
         'bg-card grid gap-2 rounded-lg border p-3 shadow-xs transition-shadow',
-        isDragging && 'z-10 opacity-50 shadow-lg'
+        isDragging && 'opacity-40'
       )}
     >
       <div className='flex items-start justify-between gap-2'>
@@ -73,6 +69,28 @@ export function FlowCard({ record, onDetail, onReassign, onNote, onRevert }: Flo
             {isTerminal ? <DropdownMenuItem onSelect={onRevert}>撤回</DropdownMenuItem> : null}
           </DropdownMenuContent>
         </DropdownMenu>
+      </div>
+      <span className='text-muted-foreground text-xs'>
+        {record.district} · {record.category}
+      </span>
+      <div className='flex items-center justify-between gap-2 text-xs'>
+        <Badge variant='outline' className='max-w-[60%] truncate'>
+          {record.priorityLabel}
+        </Badge>
+        <span className='text-muted-foreground truncate tabular-nums'>{record.assignee}</span>
+      </div>
+    </div>
+  );
+}
+
+export function FlowCardOverlay({ record }: { record: NewsTipRecordWithPriority }) {
+  return (
+    <div className='bg-card grid cursor-grabbing gap-2 rounded-lg border p-3 shadow-lg'>
+      <div className='flex items-start justify-between gap-2'>
+        <span className='min-w-0 flex-1 truncate text-sm font-medium'>{record.title}</span>
+        <Button variant='ghost' size='icon' className='size-7 shrink-0' tabIndex={-1}>
+          <Icons.ellipsis className='size-4' />
+        </Button>
       </div>
       <span className='text-muted-foreground text-xs'>
         {record.district} · {record.category}

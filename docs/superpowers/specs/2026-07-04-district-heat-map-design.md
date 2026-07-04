@@ -107,3 +107,21 @@ interface DistrictHeatMapProps {
 - 点击任意区块能正确高亮 + 弹出详情条 + 下钻跳转有效
 - 极小面积区块（如盐田/大鹏）仍可点中
 - 图例、深汕 chip 在窄屏下正常换行，不与地图重叠
+
+## 附录：全国级视图（2026-07-04 追加）
+
+用户追加需求：地图默认展示**全国**热力分布，点击广东省下钻进入原有的深圳区划热力分布图；同一张卡片内切换（非并列双卡片），显式「返回全国」按钮回退（非双击/点击空白区域，移动端更可靠）。
+
+**技术方案（与原方案一致的零运行时依赖哲学，非引入 ECharts）：**
+
+- 参考图是基于 ECharts 的中国地理地图，但本项目未使用 echarts；为保持与深圳区划图一致的架构（纯 SVG、Tailwind 主题色、无新增运行时依赖），改为：一次性使用开源 `china-geojson`（MIT，antvis）数据源，离线跑一次投影脚本（等距圆柱投影，经纬度 → SVG 坐标），把全国 35 个省级单位（含港澳台、南海诸岛）的路径数据固化为 `src/features/news-tips/lib/china-geo.ts`，与 `shenzhen-geo.ts` 同构。生成脚本本身不进入代码库，只有产物文件入库。
+- mock 数据口径：仅广东（代表深圳）按 `dashboard.districts` 汇总的 `totalCount` 着色（蓝→红 diverging，使用 `--chart-2`/`--destructive` 主题色 mix），其余省份统一 `var(--muted)` 灰底、不可点击。
+- 交互：点击广东 → 卡片内部 `level` 状态切换到 `'district'`，渲染原深圳区划图内容；`CardHeader` 右侧出现「← 返回全国」按钮，点击切回 `'national'`。两级视图共享同一张 `Card` 外壳，标题/说明文字随 level 变化。
+
+**组件结构调整：**
+
+- `district-heat-map.tsx`：导出改名为 `DistrictHeatMapView`，去掉自带的 `Card`/`CardHeader`，只保留内容（原逻辑不变）。
+- 新增 `national-heat-map.tsx`：`NationalHeatMap` 组件，渲染中国省级 choropleth，仅广东可点击下钻。
+- 新增 `region-heat-map.tsx`：`RegionHeatMap` 组件，管理 `level` 状态，包一层 `Card`，按 level 渲染 `NationalHeatMap` 或 `DistrictHeatMapView`；这是 `Cockpit` 实际引用的组件（替代原 `DistrictHeatMap`）。
+
+**PRD 同步点：** IA 描述、可视化清单、交互表新增「全国 → 深圳」两级下钻说明；标注 mock 数据仅覆盖广东/深圳，其余省份为占位灰底，非真实统计。
