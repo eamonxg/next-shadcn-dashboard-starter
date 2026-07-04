@@ -39,7 +39,7 @@ export const navGroups: NavGroup[] = [
     items: [
       {
         title: '驾驶舱',
-        url: '/dashboard/baoliao',
+        url: '/dashboard/news-tips',
         icon: 'dashboard',
         isActive: false,
         shortcut: ['d', 'd'],
