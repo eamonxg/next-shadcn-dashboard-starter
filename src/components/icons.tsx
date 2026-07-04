@@ -63,6 +63,7 @@ import {
   IconPizza,
   IconPlus,
   IconProps,
+  IconRefresh,
   IconRosetteDiscountCheck,
   IconSearch,
   IconSelector,
@@ -168,6 +169,7 @@ export const Icons = {
   login: IconLogin,
   logout: IconLogout,
   gripVertical: IconGripVertical,
+  refresh: IconRefresh,
 
   // Shapes / Indicators
   circle: IconCircle,
